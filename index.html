@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktywna mapa</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+    }
+    #container {
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        position: relative;
+    }
+    #map {
+        width: 100%;
+        height: auto;
+        display: block;
+        cursor: grab;
+        transition: transform 0.2s ease;
+    }
+</style>
+</head>
+<body>
+<div id="container">
+    <img id="map" src="https://github.com/Fakelly287/interactive-campus-map/blob/06147c2d59b2be60a8d589af707fa2db1fdc2acf/mapa.png" alt="Mapa kampusu">
+</div>
+
+<script>
+    (function() {
+        var map = document.getElementById('map');
+        var container = document.getElementById('container');
+        var isDragging = false;
+        var startX, startY;
+        var initialX = 0, initialY = 0;
+        var scale = 1;
+
+        container.addEventListener('mousedown', function(e) {
+            if (e.button === 0) {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialX = initialX || 0;
+                initialY = initialY || 0;
+                e.preventDefault();
+            }
+        });
+
+        container.addEventListener('mousemove', function(e) {
+            if (isDragging) {
+                var newX = e.clientX - startX;
+                var newY = e.clientY - startY;
+                map.style.transform = 'translate(' + (initialX + newX) + 'px, ' + (initialY + newY) + 'px) scale(' + scale + ')';
+            }
+        });
+
+        container.addEventListener('mouseup', function() {
+            isDragging = false;
+            initialX += e.clientX - startX;
+            initialY += e.clientY - startY;
+        });
+
+        container.addEventListener('mouseleave', function() {
+            if (isDragging) {
+                isDragging = false;
+                initialX += e.clientX - startX;
+                initialY += e.clientY - startY;
+            }
+        });
+
+        container.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            var delta = e.deltaY > 0 ? -0.1 : 0.1;
+            scale += delta;
+            scale = Math.min(Math.max(0.5, scale), 2); // Ograniczenie skali do 0.5 - 2
+            map.style.transform = 'translate(' + initialX + 'px, ' + initialY + 'px) scale(' + scale + ')';
+        });
+    })();
+</script>
+</body>
+</html>
